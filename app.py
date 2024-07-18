@@ -5,8 +5,10 @@ app = Flask(__name__)
 # Lista para armazenar os dados recebidos
 dados_usuarios = []
 
-def mostrar_dados():
-    return render(index.html)
+@app.route('/')
+def home():
+    return render_template('index.html')
+
     
 # Rota para receber dados via POST
 @app.route('/api/cadastrar', methods=['POST'])
