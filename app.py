@@ -30,5 +30,10 @@ def cadastrar_usuario():
         # Caso os dados não estejam no formato JSON
         return jsonify({'error': 'Dados devem ser enviados no formato JSON.'}), 400
 
+# Rota para mostrar todos os dados cadastrados
+@app.route('/dados', methods=['GET'])
+def mostrar_dados():
+    return jsonify(dados_usuarios)
+
 if __name__ == '__main__':
     app.run(debug=True)
