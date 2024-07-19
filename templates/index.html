@@ -35,8 +35,6 @@
 
     <div id="mapid" style="height: 400px;"></div>
 
-    <button onclick="loadAllData()">Carregar Todos os Dados</button>
-
     <div id="allData"></div>
 
     <script>
@@ -86,8 +84,10 @@
                 .bindPopup('Localização').openPopup();
         }
 
-        // Inicializa a página ao carregar o DOM
-        document.addEventListener('DOMContentLoaded', initializePage);
+        // Carrega os dados automaticamente ao carregar o DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+        });
     </script>
 </body>
 </html>
