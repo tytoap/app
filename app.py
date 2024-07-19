@@ -26,7 +26,7 @@ def location_information():
     print('Dados de localização recebidos:', location_data)
     return jsonify({'message': 'Dados de localização recebidos com sucesso!'})
 
-
+#
 @app.route('/dados', methods=['GET'])
 def get_data():
     return jsonify({
