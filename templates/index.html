@@ -1,9 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Hello World</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device and Location Information</title>
+    <!-- Inclua o arquivo JavaScript geo.js -->
+    <script src="{{ url_for('static', filename='geo.js') }}"></script>
 </head>
 <body>
-    <h1>Hello, World!</h1>
+    <h1>Informações do Dispositivo:</h1>
+    <ul>
+        <li>Plataforma: <span id="platform">Carregando...</span></li>
+        <li>Concorrência: <span id="concurrency">Carregando...</span></li>
+        <li>Memória: <span id="memory">Carregando...</span></li>
+        <li>Navegador: <span id="browser">Carregando...</span></li>
+        <li>Resolução: <span id="resolution">Carregando...</span></li>
+        <li>Gráficos: <span id="graphics">Carregando...</span></li>
+        <li>Sistema Operacional: <span id="os">Carregando...</span></li>
+    </ul>
+
+    <h1>Informações de Localização:</h1>
+    <ul>
+        <li>Latitude: <span id="latitude">Carregando...</span></li>
+        <li>Longitude: <span id="longitude">Carregando...</span></li>
+        <li>Precisão: <span id="accuracy">Carregando...</span></li>
+        <li>Altitude: <span id="altitude">Carregando...</span></li>
+        <li>Direção: <span id="direction">Carregando...</span></li>
+        <li>Velocidade: <span id="speed">Carregando...</span></li>
+    </ul>
+
+    <div id="locationError"></div>
+
+    <script>
+        // Aguarde o carregamento completo do DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage(); // Inicializa a página ao carregar
+        });
+    </script>
 </body>
 </html>
