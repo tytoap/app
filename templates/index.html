@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Device and Location Information</title>
-    <!-- Inclua o arquivo JavaScript geo.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="{{ url_for('static', filename='geo.js') }}"></script>
 </head>
 <body>
@@ -31,11 +33,61 @@
 
     <div id="locationError"></div>
 
+    <div id="mapid" style="height: 400px;"></div>
+
+    <button onclick="loadAllData()">Carregar Todos os Dados</button>
+
+    <div id="allData"></div>
+
     <script>
-        // Aguarde o carregamento completo do DOM
-        document.addEventListener('DOMContentLoaded', function() {
-            initializePage(); // Inicializa a página ao carregar
-        });
+        // Função para carregar todos os dados consolidados
+        function loadAllData() {
+            axios.get('/dados')
+                .then(response => {
+                    var allData = response.data;
+                    console.log('Dados consolidados:', allData);
+                    displayDeviceInformation(allData.device_information);
+                    displayLocationInformation(allData.location_information);
+                    updateMap(allData.location_information); // Chama a função para atualizar o mapa
+                    document.getElementById('allData').innerText = JSON.stringify(allData, null, 2);
+                })
+                .catch(error => console.error('Erro ao carregar dados consolidados:', error));
+        }
+
+        // Função para exibir informações do dispositivo
+        function displayDeviceInformation(data) {
+            document.getElementById('platform').innerText = data.ptf;
+            document.getElementById('concurrency').innerText = data.cc;
+            document.getElementById('memory').innerText = data.ram || 'Not Available';
+            document.getElementById('browser').innerText = data.brw || 'Not Available';
+            document.getElementById('resolution').innerText = data.wd ? data.wd + 'x' + data.ht : 'Not Available';
+            document.getElementById('graphics').innerText = data.ven + ' ' + data.ren;
+            document.getElementById('os').innerText = data.os || 'Not Available';
+        }
+
+        // Função para exibir informações de localização
+        function displayLocationInformation(data) {
+            document.getElementById('latitude').innerText = data.latitude.toFixed(6);
+            document.getElementById('longitude').innerText = data.longitude.toFixed(6);
+            document.getElementById('accuracy').innerText = data.accuracy.toFixed(2) + ' metros';
+            document.getElementById('altitude').innerText = data.altitude + ' metros';
+            document.getElementById('direction').innerText = data.direction + ' graus';
+            document.getElementById('speed').innerText = data.speed + ' m/s';
+        }
+
+        // Função para atualizar o mapa com a localização recebida
+        function updateMap(locationData) {
+            var map = L.map('mapid').setView([locationData.latitude, locationData.longitude], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            L.marker([locationData.latitude, locationData.longitude]).addTo(map)
+                .bindPopup('Localização').openPopup();
+        }
+
+        // Inicializa a página ao carregar o DOM
+        document.addEventListener('DOMContentLoaded', initializePage);
     </script>
 </body>
 </html>
