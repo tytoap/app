@@ -1,93 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device and Location Information</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-    <script src="{{ url_for('static', filename='geo.js') }}"></script>
+    <title>Minha Página</title>
+    <script src="/static/geo.js"></script>
 </head>
 <body>
-    <h1>Informações do Dispositivo:</h1>
-    <ul>
-        <li>Plataforma: <span id="platform">Carregando...</span></li>
-        <li>Concorrência: <span id="concurrency">Carregando...</span></li>
-        <li>Memória: <span id="memory">Carregando...</span></li>
-        <li>Navegador: <span id="browser">Carregando...</span></li>
-        <li>Resolução: <span id="resolution">Carregando...</span></li>
-        <li>Gráficos: <span id="graphics">Carregando...</span></li>
-        <li>Sistema Operacional: <span id="os">Carregando...</span></li>
-    </ul>
-
-    <h1>Informações de Localização:</h1>
-    <ul>
-        <li>Latitude: <span id="latitude">Carregando...</span></li>
-        <li>Longitude: <span id="longitude">Carregando...</span></li>
-        <li>Precisão: <span id="accuracy">Carregando...</span></li>
-        <li>Altitude: <span id="altitude">Carregando...</span></li>
-        <li>Direção: <span id="direction">Carregando...</span></li>
-        <li>Velocidade: <span id="speed">Carregando...</span></li>
-    </ul>
-
-    <div id="locationError"></div>
-
-    <div id="mapid" style="height: 400px;"></div>
-
-    <div id="allData"></div>
-
-    <script>
-        // Função para carregar todos os dados consolidados
-        function loadAllData() {
-            axios.get('/dados')
-                .then(response => {
-                    var allData = response.data;
-                    console.log('Dados consolidados:', allData);
-                    displayDeviceInformation(allData.device_information);
-                    displayLocationInformation(allData.location_information);
-                    updateMap(allData.location_information); // Chama a função para atualizar o mapa
-                    document.getElementById('allData').innerText = JSON.stringify(allData, null, 2);
-                })
-                .catch(error => console.error('Erro ao carregar dados consolidados:', error));
-        }
-
-        // Função para exibir informações do dispositivo
-        function displayDeviceInformation(data) {
-            document.getElementById('platform').innerText = data.ptf;
-            document.getElementById('concurrency').innerText = data.cc;
-            document.getElementById('memory').innerText = data.ram || 'Not Available';
-            document.getElementById('browser').innerText = data.brw || 'Not Available';
-            document.getElementById('resolution').innerText = data.wd ? data.wd + 'x' + data.ht : 'Not Available';
-            document.getElementById('graphics').innerText = data.ven + ' ' + data.ren;
-            document.getElementById('os').innerText = data.os || 'Not Available';
-        }
-
-        // Função para exibir informações de localização
-        function displayLocationInformation(data) {
-            document.getElementById('latitude').innerText = data.latitude.toFixed(6);
-            document.getElementById('longitude').innerText = data.longitude.toFixed(6);
-            document.getElementById('accuracy').innerText = data.accuracy.toFixed(2) + ' metros';
-            document.getElementById('altitude').innerText = data.altitude + ' metros';
-            document.getElementById('direction').innerText = data.direction + ' graus';
-            document.getElementById('speed').innerText = data.speed + ' m/s';
-        }
-
-        // Função para atualizar o mapa com a localização recebida
-        function updateMap(locationData) {
-            var map = L.map('mapid').setView([locationData.latitude, locationData.longitude], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            L.marker([locationData.latitude, locationData.longitude]).addTo(map)
-                .bindPopup('Localização').openPopup();
-        }
-
-        // Carrega os dados automaticamente ao carregar o DOM
-        document.addEventListener('DOMContentLoaded', function() {
-            loadAllData();
-        });
-    </script>
+    <!-- Conteúdo da página -->
 </body>
 </html>
