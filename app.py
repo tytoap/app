@@ -1,12 +1,16 @@
 from flask import Flask, request, jsonify, render_template
-from flask_cors import CORS
+
 
 app = Flask(__name__)
-cors = CORS(app)
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/wt')
+def wt():
+    return render_template('dashboard.html')
 
 @app.route('/api/device_information', methods=['POST'])
 def device_information():
@@ -26,15 +30,22 @@ def location_information():
     print('Dados de localização recebidos:', location_data)
     return jsonify({'message': 'Dados de localização recebidos com sucesso!'})
 
-#
+
 @app.route('/dados', methods=['GET'])
 def get_data():
+     # Construir a URL usando latitude e longitude
+    if location_data and 'latitude' in location_data and 'longitude' in location_data:
+        latitude = location_data['latitude']
+        longitude = location_data['longitude']
+        url = f'https://www.google.com/maps?q={latitude},{longitude}'
+    else:
+        url = 'Dados de localização não disponíveis'
+    
     return jsonify({
         'location_data': location_data,
-        'device_data': device_data
-          
+        'device_data': device_data,
+        'url': url
     })
-    
 
 if __name__ == '__main__':
     app.run(debug=True)
