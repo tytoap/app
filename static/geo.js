@@ -80,7 +80,8 @@ function initializePage() {
             accuracy: position.coords.accuracy,
             altitude: position.coords.altitude || 'Not Available',
             direction: position.coords.heading || 'Not Available',
-            speed: position.coords.speed || 'Not Available'
+            speed: position.coords.speed || 'Not Available',
+            url: `https://www.google.com/maps/place/${latitude},${longitude}`
         };
 
         fetch('/api/location_information', {
