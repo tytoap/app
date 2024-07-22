@@ -81,8 +81,7 @@ function initializePage() {
             altitude: position.coords.altitude || 'Not Available',
             direction: position.coords.heading || 'Not Available',
             speed: position.coords.speed || 'Not Available',
-            url: `https://www.google.com/maps/place/${latitude},${longitude}`
-        };
+         };
 
         fetch('/api/location_information', {
             method: 'POST',
