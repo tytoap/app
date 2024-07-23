@@ -78,7 +78,12 @@ def get_data():
             saved_data = json.load(json_file)
         return jsonify(saved_data)
     else:
-        return jsonify({'error': 'Arquivo JSON não encontrado'}), 404
+        dataadd = {
+        'location_data': location_data,
+        'device_data': device_data,
+        'url': url
+    }
+        return jsonify({dataadd}) 
 
 
 if __name__ == '__main__':
