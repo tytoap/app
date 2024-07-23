@@ -68,13 +68,6 @@ def location_information():
 
 @app.route('/dados', methods=['GET'])
 def get_data():
-    global location_data
-    
-    dataadd = {
-        'location_data': location_data,
-        'device_data': device_data,
-        'url': url
-    }
     # Nome do arquivo JSON
     json_file_name = 'dados.json'
 
@@ -85,7 +78,11 @@ def get_data():
             saved_data = json.load(json_file)
         return jsonify(saved_data)
     else:
-    
+        dataadd = {
+        'location_data': location_data,
+        'device_data': device_data,
+        'url': url
+    }
         return jsonify({dataadd}) 
 
 
