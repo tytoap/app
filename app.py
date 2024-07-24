@@ -68,16 +68,7 @@ def location_information():
 
 @app.route('/dados', methods=['GET'])
 def get_data():
-    # Nome do arquivo JSON
-    json_file_name = 'dados.json'
-
-    # Verificar se o arquivo JSON existe
-    if os.path.exists(json_file_name):
-        # Ler o conteúdo do arquivo JSON salvo
-        with open(json_file_name, 'r') as json_file:
-            saved_data = json.load(json_file)
-        return jsonify(saved_data)
-    else:
+   
         dataadd = {
         'location_data': location_data,
         'device_data': device_data,
