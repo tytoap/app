@@ -68,13 +68,8 @@ def location_information():
 
 @app.route('/dados', methods=['GET'])
 def get_data():
-   
-        dataadd = {
-        'location_data': location_data,
-        'device_data': device_data,
-        'url': url
-    }
-        return jsonify({dataadd}) 
+  
+        return jsonify("teste") 
 
 
 if __name__ == '__main__':
