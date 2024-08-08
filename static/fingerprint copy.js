@@ -124,57 +124,6 @@ async function getIPLocation(ip) {
     }
 }
 
-
-// Função para exibir o vídeo ao vivo da câmera
-async function showLiveCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.autoplay = true;
-
-        // Adiciona o vídeo à div de câmera ao vivo
-        const cameraDiv = document.getElementById('live-camera');
-        cameraDiv.innerHTML = ''; // Limpa o conteúdo atual
-        cameraDiv.appendChild(video);
-
-        // Retorna o stream para que possa ser usado em outra função, se necessário
-        return stream;
-    } catch (error) {
-        console.error('Error accessing camera:', error);
-        throw error;
-    }
-}
-
-
-
-
-
-
-// Acessar a câmera e capturar uma foto
-async function accessCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.play();
-        await new Promise(resolve => video.onloadedmetadata = resolve);
-
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        stream.getTracks().forEach(track => track.stop());
-
-        return canvas.toDataURL();
-    } catch (error) {
-        console.error('Error accessing camera:', error);
-        throw error;
-    }
-}
-
 // Função para renderizar os resultados
 async function displayResults() {
     const basicInfo = detectBasicInfo();
@@ -250,33 +199,8 @@ async function displayResults() {
         `;
     }
 
-    // Acessar a câmera e capturar uma foto
-    try {
-        const cameraImage = await accessCamera();
-        output += `
-            <h2>Imagem da Câmera</h2>
-            <img src="${cameraImage}" alt="Camera Image"/>
-        `;
-    } catch (error) {
-        output += `
-            <h2>Imagem da Câmera</h2>
-            <p>${error.message}</p>
-        `;
-    }
-
     document.getElementById('output').innerHTML = output;
 }
 
-
-
 // Chama a função para exibir os resultados quando a página é carregada
-//window.onload = displayResults;
-
-// Chama a função para exibir os resultados quando a página é carregada
-window.onload = async () => {
-     // Exibe as outras informações
-     await displayResults();
-    // Exibe o vídeo ao vivo da câmera
-    await showLiveCamera();
-   
-};
+window.onload = displayResults;
