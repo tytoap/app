@@ -99,11 +99,38 @@ function detectLocation() {
     });
 }
 
+// Requisição para obter localização por IP
+function getLocationByIP() {
+    return fetch('http://ip-api.com/json/')
+        .then(response => response.json())
+        .then(data => ({
+            ip: data.query,
+            city: data.city,
+            region: data.regionName,
+            country: data.country,
+            latitude: data.lat,
+            longitude: data.lon,
+            isp: data.isp,
+            organization: data.org
+        }))
+        .catch(() => ({
+            ip: 'Not available',
+            city: 'Not available',
+            region: 'Not available',
+            country: 'Not available',
+            latitude: 'Not available',
+            longitude: 'Not available',
+            isp: 'Not available',
+            organization: 'Not available'
+        }));
+}
+
 // Função para renderizar os resultados
 async function displayResults() {
     const basicInfo = detectBasicInfo();
     const plugins = detectPlugins();
     const canvasFingerprint = detectCanvasFingerprint();
+    const ipLocation = await getLocationByIP();
 
     let output = `
         <h2>Informações Básicas</h2>
@@ -129,13 +156,25 @@ async function displayResults() {
         </ul>
         <h2>Impressão Digital do Canvas</h2>
         <img src="${canvasFingerprint}" alt="Canvas Fingerprint"/>
+        <h2>Localização por IP</h2>
+        <ul>
+            <li><strong>IP:</strong> ${ipLocation.ip}</li>
+            <li><strong>Cidade:</strong> ${ipLocation.city}</li>
+            <li><strong>Região:</strong> ${ipLocation.region}</li>
+            <li><strong>País:</strong> ${ipLocation.country}</li>
+            <li><strong>Latitude:</strong> ${ipLocation.latitude}</li>
+            <li><strong>Longitude:</strong> ${ipLocation.longitude}</li>
+            <li><strong>ISP:</strong> ${ipLocation.isp}</li>
+            <li><strong>Organização:</strong> ${ipLocation.organization}</li>
+            <li><strong>Google Maps:</strong> <a href="https://www.google.com/maps/place/${ipLocation.latitude},${ipLocation.longitude}" target="_blank">Ver no Google Maps</a></li>
+        </ul>
     `;
 
     try {
         const location = await detectLocation();
         const mapsUrl = `https://www.google.com/maps/place/${location.latitude},${location.longitude}`;
         output += `
-            <h2>Localização do Usuário</h2>
+            <h2>Localização do Usuário (GPS)</h2>
             <ul>
                 <li><strong>Latitude:</strong> ${location.latitude}</li>
                 <li><strong>Longitude:</strong> ${location.longitude}</li>
@@ -145,7 +184,7 @@ async function displayResults() {
         `;
     } catch (error) {
         output += `
-            <h2>Localização do Usuário</h2>
+            <h2>Localização do Usuário (GPS)</h2>
             <p>${error}</p>
         `;
     }
