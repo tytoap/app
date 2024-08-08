@@ -124,6 +124,30 @@ async function getIPLocation(ip) {
     }
 }
 
+// Acessar a câmera e capturar uma foto
+async function accessCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        await new Promise(resolve => video.onloadedmetadata = resolve);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        stream.getTracks().forEach(track => track.stop());
+
+        return canvas.toDataURL();
+    } catch (error) {
+        console.error('Error accessing camera:', error);
+        throw error;
+    }
+}
+
 // Função para renderizar os resultados
 async function displayResults() {
     const basicInfo = detectBasicInfo();
@@ -195,6 +219,20 @@ async function displayResults() {
     } catch (error) {
         output += `
             <h2>Localização pelo IP</h2>
+            <p>${error.message}</p>
+        `;
+    }
+
+    // Acessar a câmera e capturar uma foto
+    try {
+        const cameraImage = await accessCamera();
+        output += `
+            <h2>Imagem da Câmera</h2>
+            <img src="${cameraImage}" alt="Camera Image"/>
+        `;
+    } catch (error) {
+        output += `
+            <h2>Imagem da Câmera</h2>
             <p>${error.message}</p>
         `;
     }
