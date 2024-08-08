@@ -1,17 +1,4 @@
-async function getLocationByIP() {
-    try {
-        const response = await fetch('/api/ip-location');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching IP location:', error);
-        return { error: error.message };
-    }
-}
-
+// Detecção de plugins instalados
 function detectPlugins() {
     const pluginNames = ["Shockwave Flash", "Java", "QuickTime", "Silverlight", "Adobe Acrobat"];
     const detectedPlugins = [];
@@ -27,6 +14,7 @@ function detectPlugins() {
     return detectedPlugins;
 }
 
+// Detecção de propriedades básicas do navegador e do dispositivo
 function detectBasicInfo() {
     var ver = navigator.userAgent;
     return {
@@ -48,6 +36,7 @@ function detectBasicInfo() {
     };
 }
 
+// Funções auxiliares para detectar o sistema operacional e navegador
 function detectOS(userAgent) {
     if (userAgent.indexOf('Win') !== -1) return 'Windows';
     if (userAgent.indexOf('Mac') !== -1) return 'MacOS';
@@ -64,6 +53,7 @@ function detectBrowser(userAgent) {
     return 'Unknown';
 }
 
+// Impressão digital do Canvas
 function detectCanvasFingerprint() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -81,13 +71,14 @@ function detectCanvasFingerprint() {
     return canvas.toDataURL();
 }
 
+// Detecção da localização do usuário com precisão adicional
 function detectLocation() {
     return new Promise((resolve, reject) => {
         if ('geolocation' in navigator) {
             const options = {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
+                enableHighAccuracy: true, // Tenta obter a localização mais precisa
+                timeout: 10000,           // Tempo máximo para obter a localização (10 segundos)
+                maximumAge: 0            // Não usa a localização em cache
             };
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -108,6 +99,7 @@ function detectLocation() {
     });
 }
 
+// Função para renderizar os resultados
 async function displayResults() {
     const basicInfo = detectBasicInfo();
     const plugins = detectPlugins();
@@ -143,7 +135,7 @@ async function displayResults() {
         const location = await detectLocation();
         const mapsUrl = `https://www.google.com/maps/place/${location.latitude},${location.longitude}`;
         output += `
-            <h2>Localização do Usuário (GPS)</h2>
+            <h2>Localização do Usuário</h2>
             <ul>
                 <li><strong>Latitude:</strong> ${location.latitude}</li>
                 <li><strong>Longitude:</strong> ${location.longitude}</li>
@@ -153,34 +145,38 @@ async function displayResults() {
         `;
     } catch (error) {
         output += `
-            <h2>Localização do Usuário (GPS)</h2>
+            <h2>Localização do Usuário</h2>
             <p>${error}</p>
         `;
     }
 
-    // Adiciona a localização baseada em IP
-    const ipLocation = await getLocationByIP();
-    if (ipLocation.error) {
+    // Requisição para obter localização IP
+    try {
+        const response = await fetch('/api/ip-location');
+        if (!response.ok) throw new Error('Failed to fetch IP location');
+        const ipLocation = await response.json();
+        const mapsUrl = `https://www.google.com/maps/place/${ipLocation.lat},${ipLocation.lon}`;
         output += `
-            <h2>Localização do Usuário (IP)</h2>
-            <p>${ipLocation.error}</p>
-        `;
-    } else {
-        const ipMapsUrl = `https://www.google.com/maps/place/${ipLocation.lat},${ipLocation.lon}`;
-        output += `
-            <h2>Localização do Usuário (IP)</h2>
+            <h2>Localização pelo IP</h2>
             <ul>
+                <li><strong>IP:</strong> ${ipLocation.query}</li>
                 <li><strong>Latitude:</strong> ${ipLocation.lat}</li>
                 <li><strong>Longitude:</strong> ${ipLocation.lon}</li>
                 <li><strong>Cidade:</strong> ${ipLocation.city}</li>
-                <li><strong>Região:</strong> ${ipLocation.region}</li>
+                <li><strong>Região:</strong> ${ipLocation.regionName}</li>
                 <li><strong>País:</strong> ${ipLocation.country}</li>
-                <li><strong>Google Maps:</strong> <a href="${ipMapsUrl}" target="_blank">Ver no Google Maps</a></li>
+                <li><strong>Google Maps:</strong> <a href="${mapsUrl}" target="_blank">Ver no Google Maps</a></li>
             </ul>
+        `;
+    } catch (error) {
+        output += `
+            <h2>Localização pelo IP</h2>
+            <p>${error.message}</p>
         `;
     }
 
     document.getElementById('output').innerHTML = output;
 }
 
+// Chama a função para exibir os resultados quando a página é carregada
 window.onload = displayResults;
