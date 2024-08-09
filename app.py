@@ -7,6 +7,10 @@ CORS(app)  # Configura o CORS para permitir todas as origens. Pode ser configura
 # Variável global para armazenar os dados
 stored_data = {}
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/submit_data', methods=['POST'])
 def submit_data():
     global stored_data
