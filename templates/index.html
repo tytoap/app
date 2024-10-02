@@ -11,12 +11,38 @@
     <meta property="og:url" content="https://www.santander.com.br/hotsite/santanderfinanciamentos/">
     <title>Minha Página</title>
     
+    <style>
+        /* Estilos do spinner */
+        .spinner {
+            border: 16px solid #f3f3f3; /* Cor do fundo */
+            border-top: 16px solid #3498db; /* Cor do topo */
+            border-radius: 50%;
+            width: 60px; /* Largura do spinner */
+            height: 60px; /* Altura do spinner */
+            animation: spin 2s linear infinite; /* Animação de rotação */
+            margin: 0 auto; /* Centraliza o spinner */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Estilo do container do carregamento */
+        .loading-container {
+            text-align: center; /* Centraliza o texto */
+            margin-top: 20px; /* Espaçamento superior */
+        }
+    </style>
+
     <!-- Incluindo o arquivo JavaScript externo -->
     <script src="/static/geo.js" defer></script>
 </head>
 <body>
-    <!-- Conteúdo da página -->
-    <h1>Bem-vindo à Minha Página</h1>
-    <p>Aguarde enquanto coletamos suas informações...</p>
+    
+    <div class="loading-container">
+        <div class="spinner"></div> <!-- Spinner de carregamento -->
+       
+    </div>
 </body>
 </html>
