@@ -5,6 +5,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)  # Configura o CORS para permitir todas as origens. Pode ser configurado mais especificamente se necessário.
 
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 # Rota para receber as coordenadas do mapa
 @app.route('/location', methods=['POST'])
