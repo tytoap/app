@@ -11,10 +11,12 @@ CORS(app)  # Configura o CORS para permitir todas as origens. Pode ser configura
 def receive_location():
     data = request.json  # Recebendo os dados em JSON
     google_map_link = data.get('data')
+    name = data.get('name')
     
     if google_map_link:
         # Aqui você pode fazer o que quiser com o link do Google Maps
         print(f"Google Map Link Received: {google_map_link}")
+        print(f"nome: {name}")
         return jsonify({"status": "success", "message": "Location received"}), 200
     else:
         return jsonify({"status": "error", "message": "No data received"}), 400
